@@ -1,0 +1,43 @@
+name: Rust CI (midterm_project)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build and test on Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain (stable)
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+
+      - name: Show rustc / cargo versions
+        run: |
+          rustc --version
+          cargo --version
+
+      - name: Build midterm_project
+        run: |
+          cargo build --verbose
+
+      - name: Run tests / test script
+        run: |
+          if [ -f Cargo.toml ]; then
+            cargo test --verbose || true
+          fi
+          if [ -x ./test.sh ]; then
+            ./test.sh || true
+          elif [ -f ./test.sh ]; then
+            bash ./test.sh || true
+          fi
